@@ -12,7 +12,11 @@ const BursaryApplication = require("./models/BursaryApplication");
 
 dotenv.config();
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: "https://bursaryapp-bzldpvdk2-winnies-projects-fd469aa1.vercel.app"
+}));
+
 app.use(express.json());
 app.use("/uploads", express.static("uploads")); // serve uploaded files
 
