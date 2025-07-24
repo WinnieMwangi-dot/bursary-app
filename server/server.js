@@ -13,19 +13,32 @@ const BursaryApplication = require("./models/BursaryApplication");
 dotenv.config();
 const app = express();
 
+// ✅ Recommended: Dynamic CORS for local + production
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "https://bursaryapp-bzldpvdk2-winnies-projects-fd469aa1.vercel.app" // your deployed frontend
+];
+
 app.use(cors({
-  origin: "https://bursaryapp-bzldpvdk2-winnies-projects-fd469aa1.vercel.app"
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
 }));
 
 app.use(express.json());
-app.use("/uploads", express.static("uploads")); // serve uploaded files
+app.use("/uploads", express.static("uploads"));
 
-// Connect to MongoDB
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// Multer setup for file upload
+// ✅ File upload config
 const storage = multer.diskStorage({
   destination: "uploads/",
   filename: (req, file, cb) => {
@@ -34,7 +47,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Nodemailer setup
+// ✅ Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -43,7 +56,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// 📩 Confirmation email
+// ✅ Send confirmation email
 const sendConfirmationEmail = (to, fullName) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -57,7 +70,7 @@ const sendConfirmationEmail = (to, fullName) => {
   });
 };
 
-// 📝 Submit application
+// ✅ Submit application route
 app.post("/api/apply", upload.single("document"), async (req, res) => {
   try {
     const { fullName, email, school, familyIncome } = req.body;
@@ -80,7 +93,7 @@ app.post("/api/apply", upload.single("document"), async (req, res) => {
   }
 });
 
-// 🔍 Get all with optional search
+// ✅ Get all applications (with optional search)
 app.get("/api/applications", async (req, res) => {
   const { search } = req.query;
   const filter = search
@@ -116,7 +129,7 @@ app.put("/api/applications/:id/status", async (req, res) => {
   }
 });
 
-// 📤 Export to CSV
+// ✅ Export to CSV
 app.get("/api/export", async (req, res) => {
   try {
     const apps = await BursaryApplication.find();
@@ -130,6 +143,7 @@ app.get("/api/export", async (req, res) => {
   }
 });
 
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
