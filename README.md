@@ -86,3 +86,7 @@ Copy
 Edit
 npm run dev
 
+DEPLOYMENT FRONTEND AND BACKEND
+https://bursary-app-4hya.onrender.com
+https://bursaryapp-bzldpvdk2-winnies-projects-fd469aa1.vercel.app
+
